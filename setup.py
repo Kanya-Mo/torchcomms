@@ -152,6 +152,7 @@ if USE_RCCL:
 if USE_RCCLX:
     ext_modules += [
         CMakeExtension("torchcomms._comms_rcclx"),
+    ]
 if USE_XCCL:
     ext_modules += [
         CMakeExtension("torchcomms._comms_xccl"),

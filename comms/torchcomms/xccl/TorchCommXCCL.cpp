@@ -2168,6 +2168,48 @@ class XCCLRegistration {
     torch::comms::TorchCommFactory::get().register_backend("xccl", []() {
       return std::make_shared<torch::comms::TorchCommXCCL>();
     });
+
+    // Register allocator factory with its own xccl_api instance
+    torch::comms::TorchCommFactory::get().register_allocator_factory(
+        "xccl", []() {
+          // Create xccl_api for this allocator (captured in lambdas below)
+          auto xccl_api = std::make_shared<torch::comms::DefaultXcclApi>();
+
+          static std::shared_ptr<c10::xpu::XPUCachingAllocator::XPUAllocator>
+              xccl_allocator =
+                  torch::xpu::XPUPluggableAllocator::createCustomAllocator(
+                      // alloc_fn
+                      [xccl_api](size_t size, int device, xpuStream_t stream) {
+                        c10::OptionalDeviceGuard gpuGuard(device);
+                        void* ptr = nullptr;
+                        xcclResult_t result = xccl_api->memAlloc(&ptr, size);
+                        TORCH_CHECK(
+                            result == xcclSuccess,
+                            "xcclMemAlloc failed: ",
+                            xccl_api->getErrorString(result));
+                        LOG(INFO) << "XCCL mem allocator: allocated " << ptr
+                                  << " with " << size << " bytes in stream "
+                                  << stream;
+                        return ptr;
+                      },
+                      // free_fn
+                      [xccl_api](
+                          void* ptr,
+                          size_t size,
+                          int device,
+                          xpuStream_t stream) {
+                        LOG(INFO)
+                            << "XCCL mem allocator: freeing " << ptr << " with "
+                            << size << " bytes in stream " << stream;
+                        c10::OptionalDeviceGuard gpuGuard(device);
+                        xcclResult_t result = xccl_api->memFree(ptr);
+                        TORCH_CHECK(
+                            result == xcclSuccess,
+                            "xcclMemFree failed: ",
+                            xccl_api->getErrorString(result));
+                      });
+          return xccl_allocator;
+        });
   }
 };
 

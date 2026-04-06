@@ -47,6 +47,14 @@ class XCCLException : public std::exception {
   onecclResult_t result_;
 };
 
+#define XCCL_CHECK(xccl_api, xccl_comm, call, err_str)            \
+  do {                                                            \
+    onecclResult_t status = call;                                   \
+    if (status != onecclSuccess) {                                  \
+      throw XCCLException(*xccl_api, err_str, status, xccl_comm); \
+    }                                                             \
+  } while (0)
+
 class TorchCommXCCL : public TorchCommBackend,
                       public std::enable_shared_from_this<TorchCommXCCL> {
  public:

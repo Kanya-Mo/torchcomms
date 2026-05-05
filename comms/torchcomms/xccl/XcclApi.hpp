@@ -237,6 +237,17 @@ class DefaultXcclApi : public XcclApi {
   [[nodiscard]] onecclResult_t commDeregister(onecclComm_t comm, void* handle)
       override;
 
+  [[nodiscard]] virtual onecclResult_t commWindowRegister(
+      onecclComm_t comm, 
+      void* buffer, 
+      size_t size, 
+      onecclWindow_t *window,
+      onecclWindowFlags_t flags) override;
+
+  [[nodiscard]] virtual onecclResult_t commWindowDeregister(
+      onecclComm_t comm,
+      onecclWindow_t *window) override;
+
   // Point-to-point operations
   [[nodiscard]] onecclResult_t send(
       const void* sendbuff,

@@ -59,6 +59,17 @@ class XcclApi {
       onecclComm_t comm,
       void* handle) = 0;
 
+  [[nodiscard]] virtual onecclResult_t commWindowRegister(
+      onecclComm_t comm, 
+      void* buffer, 
+      size_t size, 
+      onecclWindow_t *window,
+      onecclWindowFlags_t flags) = 0;
+
+  [[nodiscard]] virtual onecclResult_t commWindowDeregister(
+      onecclComm_t comm,
+      onecclWindow_t *window) = 0;
+
   // Point-to-point operations
   [[nodiscard]] virtual onecclResult_t send(
       const void* sendbuff,

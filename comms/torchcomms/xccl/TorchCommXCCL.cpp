@@ -2157,9 +2157,9 @@ void TorchCommXCCL::register_address(
   if (memoryRegistrationHandles_.contains(addr.addr)) {
     throw std::runtime_error("Memory already registered with XCCL");
   }
-  void* handle = nullptr;
+  onecclWindow_t handle = nullptr;
   onecclResult_t result =
-      xccl_api_->commRegister(xccl_comm_, addr.addr, addr.len, &handle);
+      xccl_api_->commWindowRegister(xccl_comm_, addr.addr, addr.len, &handle, ONECCL_WINDOW_COLL_SYMMETRIC);
 
   if (result != onecclSuccess) [[unlikely]] {
     throw XCCLException(
@@ -2181,7 +2181,7 @@ void TorchCommXCCL::deregister_address(const TorchCommXCCL::Address& addr) {
     return;
   }
 
-  void* handle = it->second.regHandle;
+  onecclWindow_t handle = it->second.regHandle;
   onecclResult_t result = xccl_api_->commDeregister(xccl_comm_, handle);
 
   if (result != onecclSuccess) [[unlikely]] {

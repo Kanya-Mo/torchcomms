@@ -281,7 +281,7 @@ class TorchCommXCCL : public TorchCommBackend,
 
   // Struct to hold the registration handle for a buffer
   struct RegistrationHandle {
-    void* regHandle;
+    onecclWindow_t regHandle;
 
     explicit RegistrationHandle(void* regHandle) : regHandle{regHandle} {}
 

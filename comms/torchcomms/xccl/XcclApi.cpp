@@ -59,8 +59,6 @@ onecclResult_t DefaultXcclApi::commSplit(
   return onecclCommSplit(comm, color, key, newcomm, config);
 }
 
-// Remove [[maybe_unused]] when implementing this function once
-// onecclCommRegister is available.
 onecclResult_t DefaultXcclApi::commRegister(
     onecclComm_t comm,
     void* buffer,
@@ -69,10 +67,21 @@ onecclResult_t DefaultXcclApi::commRegister(
   return onecclCommRegister(comm, buffer, size, handle);
 }
 
-// Remove [[maybe_unused]] when implementing this function once
-// onecclCommDeregister is available.
 onecclResult_t DefaultXcclApi::commDeregister(onecclComm_t comm, void* handle) {
   return onecclCommDeregister(comm, handle);
+}
+
+onecclResult_t DefaultXcclApi::commWindowRegister(
+    onecclComm_t comm,
+    void* buffer,
+    size_t size,
+    onecclWindow_t *window,
+    onecclWindowFlags_t flags) {
+  return onecclCommWindowRegister(comm, buffer, size, window, flags);
+}
+
+onecclResult_t DefaultXcclApi::commWindowDeregister(onecclComm_t comm, onecclWindow_t *window) {
+  return onecclCommWindowDeregister(comm, window);
 }
 
 onecclResult_t DefaultXcclApi::send(
